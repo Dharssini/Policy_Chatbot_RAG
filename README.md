@@ -1,5 +1,6 @@
 # Chatbot for Policy Document using RAG
 <img src="https://raw.githubusercontent.com/Dharssini/Policy_Chatbot_RAG/main/demoproj.gif" width="800">
+
 ## Overview
 This project involves creating a chatbot for querying policy documents using Retrieval-Augmented Generation (RAG). The system utilizes Flask as the backend framework and LM Studio, which runs the DeepSeek model for inference. The language model is exposed via an ngrok tunnel, and the Flask application is deployed on Render. Additionally, Docker is used for containerization, and MLOps is integrated to streamline model deployment, monitoring, and maintenance. The Flask API interacts with the locally running LLM endpoint for answering user queries.
 
