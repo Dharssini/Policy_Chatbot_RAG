@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}"/>
+</head>
+<body>
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Chat Section -->
+            <div class="col-md-4 chat-section">
+                <div class="card chat-box">
+                    <div class="card-header msg_head">
+                        <div class="d-flex bd-highlight">
+                            <div class="img_cont">
+                                <img src="https://cdn-icons-png.flaticon.com/512/4252/4252292.png" class="rounded-circle user_img">
+                            </div>
+                            <div class="user_info">
+                                <span>TriageLogic's Chatbot</span>
+                                <p>Ask me anything about Policies!</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="messageFormeight" class="card-body msg_card_body"></div>
+                    <div class="card-footer">
+                        <form id="messageArea" class="input-group">
+                            <input type="text" id="text" name="msg" placeholder="Type your message..." autocomplete="off" class="form-control type_msg" required/>
+                            <div class="input-group-append">
+                                <button type="submit" id="send" class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Sample Questions -->
+                <div class="sample-questions">
+                    <p class="small text-muted">Try asking:</p>
+					<button class="btn btn-light btn-sm">Who is the CEO of TriageLogic, and what are their responsibilities?</button>
+					<button class="btn btn-light btn-sm">How should employees report a potential compliance issue?</button>
+                    <button class="btn btn-light btn-sm">Can you tell me about the organizational structure of TriageLogic?</button>
+                    <button class="btn btn-light btn-sm">How often are company policies reviewed and updated?</button>
+                    <button class="btn btn-light btn-sm">What is TriageLogic’s approach to HIPAA compliance?</button>
+                    <button class="btn btn-light btn-sm">How should employees report a potential compliance issue?</button>
+                    <button class="btn btn-light btn-sm">What is the document management policy for employees?</button>
+                    <button class="btn btn-light btn-sm">Can you explain the company’s email monitoring policy?</button>
+                    <button class="btn btn-light btn-sm">What are the disciplinary actions for non-compliance with company policies?</button>
+                    <button class="btn btn-light btn-sm">What is the process for clinical staff credentialing?</button>
+                    <button class="btn btn-light btn-sm">What is TriageLogic’s disaster recovery policy?</button>
+                    <button class="btn btn-light btn-sm">What are the company’s guidelines for document retention?</button>
+                </div>
+            </div>
+
+            <!-- PDF Viewer -->
+            <div class="col-md-8 pdf-viewer">
+                <iframe src="{{ url_for('static', filename='Company-Policy-and-Procedure-June-1.18-V6.0.pdf') }}" width="100%" height="100%"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#messageArea").on("submit", function(event) {
+                event.preventDefault();
+                
+                const date = new Date();
+                const hour = date.getHours();
+                const minute = date.getMinutes();
+                const str_time = hour + ":" + (minute < 10 ? "0" + minute : minute);
+                var rawText = $("#text").val();
+                
+                var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">' + rawText + '<span class="msg_time_send">' + str_time + '</span></div><div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div></div>';
+                
+                $("#text").val("");
+                $("#messageFormeight").append(userHtml);
+                
+                // Show typing indicator
+                var typingHtml = '<div id="typingIndicator" class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://cdn-icons-png.flaticon.com/512/4252/4252292.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">Chatbot is typing...<span class="msg_time">' + str_time + '</span></div></div>';
+                $("#messageFormeight").append(typingHtml);
+                
+                $.ajax({
+                    data: { msg: rawText },
+                    type: "POST",
+                    url: "/get",
+                }).done(function(data) {
+                    $("#typingIndicator").remove(); // Remove typing indicator
+                    
+                    var botHtml = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img src="https://cdn-icons-png.flaticon.com/512/4252/4252292.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer">' + data + '<span class="msg_time">' + str_time + '</span></div></div>';
+                    $("#messageFormeight").append($.parseHTML(botHtml));
+                });
+            });
+
+            // Make suggested questions selectable
+            $(".sample-questions .btn").on("click", function() {
+                $("#text").val($(this).text());  // Set question text in input field
+                $("#messageArea").submit();  // Automatically submit the form
+            });
+        });
+    </script>
+</body>
+</html>
